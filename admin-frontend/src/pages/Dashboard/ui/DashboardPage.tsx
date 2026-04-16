@@ -1,37 +1,45 @@
-import { useState } from "react";
-
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
-
-import { mockUsers } from "../../../entities/user/model/mock";
-import type { User } from "../../../entities/user/model/types";
 
 import { UsersList } from "../../../widgets/user-list/ui/UserList";
 import { EditUserModal } from "../../../features/user-edit/ui/EditUserModal";
 
+import { useState } from "react";
+import type { User } from "../../../entities/user/model/types";
+
+import {
+  useGetUsersQuery,
+  useDeleteUserMutation,
+  useUpdateUserMutation,
+} from "../../../entities/user/api/userApi";
+import { mapUserToUpdateDTO } from "../../../shared/helpers/mapUserToUpdateDTO";
+
 const DashboardPage = () => {
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const { data: users = [] } = useGetUsersQuery();
+
+  const [deleteUser] = useDeleteUserMutation();
+  const [updateUser] = useUpdateUserMutation();
+
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState(false);
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
     setOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    // TODO: API call
-    setUsers((prev) => prev.filter((u) => u.userId !== id));
+  const handleDelete = async (id: string) => {
+    await deleteUser(id);
   };
 
-  const handleSave = (updatedUser: User) => {
-    // TODO: API call
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.userId === updatedUser.userId ? updatedUser : u
-      )
-    );
+  const handleSave = async (updatedUser: User) => {
+    await updateUser({
+      userId: updatedUser.userId,
+      data: mapUserToUpdateDTO(updatedUser),
+    });
+
     setOpen(false);
+    setSelectedUser(null);
   };
 
   const handleClose = () => {
