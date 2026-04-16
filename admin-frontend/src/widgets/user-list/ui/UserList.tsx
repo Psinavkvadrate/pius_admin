@@ -24,10 +24,11 @@ export const UsersList = ({ users, onEdit, onDelete }: Props) => {
             </Box>
 
             <Box>
-              <IconButton onClick={() => onEdit(user)}>
+              <IconButton data-testid="edit-button" onClick={() => onEdit(user)}>
                 <EditIcon />
               </IconButton>
-              <IconButton onClick={() => onDelete(user.userId)} color="error">
+
+              <IconButton data-testid="delete-button" onClick={() => onDelete(user.userId)}>
                 <DeleteIcon />
               </IconButton>
             </Box>
